@@ -1,33 +1,105 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reminders/UI elements/animated_text.dart';
 import 'package:reminders/UI elements/humraTextfildu.dart';
 import 'package:reminders/UI elements/button.dart';
 
+class LoginPage extends StatefulWidget {
+  LoginPage({super.key});
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends State<LoginPage> {
   final userEmail = TextEditingController();
   final userPassword = TextEditingController();
 
-  void signUserIn(){
+  void signUserIn() async {
 
+    /*
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+          ),
+        );
+      },
+    );
+    */
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: userEmail.text,
+        password: userPassword.text,
+      );
+      //Navigator.pop(context); // Dismiss the loading dialog
+    } on FirebaseAuthException catch (e) {
+      //Navigator.pop(context); // Dismiss the loading dialog
+
+
+      if (e.code == 'user-not-found') {
+
+        EmailNotThere();
+
+      } else if (e.code == 'wrong-password') {
+
+        WrongPassword();
+
+      }
+    }
   }
 
+  void EmailNotThere() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          title: Center(
+            child: Text(
+              'Incorrect Email',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // wrong password message popup
+  void WrongPassword() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          title: Center(
+            child: Text(
+              'Incorrect Password',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
+              const SizedBox(height: 50),
 
               AnimaText(),
 
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
 
               Myfield(
                 controller: userEmail,
@@ -35,7 +107,7 @@ class LoginPage extends StatelessWidget {
                 obscureText: false,
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 15),
 
               Myfield(
                 controller: userPassword,
@@ -43,7 +115,7 @@ class LoginPage extends StatelessWidget {
                 obscureText: true,
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 15),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 28.0),
@@ -58,11 +130,65 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               MyButton(
                 onTap: signUserIn,
               ),
+
+              const SizedBox(height: 45),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Expanded(
+                    child: Divider(
+                        thickness: 2.5,
+                      ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                          "Or Continue With",
+                        style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
+                      ),
+                  ),
+                  const Expanded(
+                    child: Divider(
+                      thickness: 2.5,
+                    ),
+                  ),
+                    ],
+                  ),
+              const SizedBox(height: 45),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'lib/images/google_light.png',
+                    height: 70,
+                  )
+                ],
+              ),
+              const SizedBox(height: 30),
+
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Not a member?  ",
+                    style: TextStyle(
+                        fontSize: 15
+                    ),
+                  ),
+                  Text(
+                    "Register Now!",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 15
+                    ),
+                  )
+                ],
+              )
             ],
           ),
         ),
@@ -70,3 +196,4 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
+
