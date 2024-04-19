@@ -14,47 +14,26 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final userEmail = TextEditingController();
   final userPassword = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>(); // Add this line
 
   void signUserIn() async {
-
-    /*
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
-          ),
-        );
-      },
-    );
-    */
-
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: userEmail.text,
         password: userPassword.text,
       );
-      //Navigator.pop(context); // Dismiss the loading dialog
     } on FirebaseAuthException catch (e) {
-      //Navigator.pop(context); // Dismiss the loading dialog
-
-
       if (e.code == 'user-not-found') {
-
         EmailNotThere();
-
       } else if (e.code == 'wrong-password') {
-
         WrongPassword();
-
       }
     }
   }
 
   void EmailNotThere() {
     showDialog(
-      context: context,
+      context: _scaffoldKey.currentContext, // Change this line
       builder: (context) {
         return const AlertDialog(
           backgroundColor: Colors.deepPurple,
@@ -69,10 +48,9 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // wrong password message popup
   void WrongPassword() {
     showDialog(
-      context: context,
+      context: _scaffoldKey.currentContext, // Change this line
       builder: (context) {
         return const AlertDialog(
           backgroundColor: Colors.deepPurple,
@@ -90,6 +68,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Center(
           child: Column(
